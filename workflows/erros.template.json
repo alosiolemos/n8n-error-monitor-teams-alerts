@@ -1,0 +1,143 @@
+{
+  "name": "Monitor de falhas — n8n e Microsoft Teams — erros — template público",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "teamId": {
+          "__rl": true,
+          "value": "CONFIGURE_ID_218",
+          "mode": "list"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "19:contato@example.com2",
+          "mode": "list"
+        },
+        "contentType": "html",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [
+        64,
+        464
+      ],
+      "id": "cd978474-4662-4299-b03c-0feae4b5d02c",
+      "name": "Operações",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        48,
+        16
+      ],
+      "id": "64027200-c300-49cc-b49d-cd77b673930b",
+      "name": "Error Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Monitor de falhas — n8n e Microsoft Teams\nTemplate público inativo. Bloco 3. Consulte docs/arquitetura.md.",
+        "height": 816,
+        "width": 576,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -144
+      ],
+      "id": "fbdb6632-b1a6-44f8-b507-71ed900b72ec",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Monitor de falhas — n8n e Microsoft Teams\nTemplate público inativo. Bloco 4. Consulte docs/arquitetura.md.",
+        "height": 816,
+        "width": 576,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -144
+      ],
+      "id": "553c4c96-20a7-43a2-b132-8608bd5bd0ab",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "resource": "chatMessage",
+        "chatId": {
+          "__rl": true,
+          "value": "19:CONFIGURE_ID_223@thread.v2",
+          "mode": "list"
+        },
+        "contentType": "html",
+        "message": "={{ $json.html }}",
+        "options": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [
+        464,
+        480
+      ],
+      "id": "86b17f30-247f-4978-b226-49d767beeac1",
+      "name": "Teste",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const execution = $json.execution ?? {};\nconst workflow = $json.workflow ?? {};\nconst error = execution.error ?? {};\n\nconst data = new Date().toLocaleString(\"pt-BR\", {\n  timeZone: \"America/Sao_Paulo\",\n});\n\nconst stack = (error.stack ?? \"\")\n  .replace(/</g, \"&lt;\")\n  .replace(/>/g, \"&gt;\");\n\nconst incidente = `INC-${new Date()\n  .toISOString()\n  .slice(0, 10)\n  .replace(/-/g, \"\")}-${execution.id ?? \"SEM_ID\"}`;\n\nconst mensagem = (error.message ?? \"\").toLowerCase();\n\nlet severidade = \"🟢 Baixa\";\nlet cor = \"#107C10\";\n\nif (\n  mensagem.includes(\"connection\") ||\n  mensagem.includes(\"database\") ||\n  mensagem.includes(\"econnreset\") ||\n  mensagem.includes(\"timeout\") ||\n  mensagem.includes(\"socket\") ||\n  mensagem.includes(\"credential\")\n) {\n  severidade = \"🔴 Crítica\";\n  cor = \"#c50f1f\";\n} else if (\n  mensagem.includes(\"429\") ||\n  mensagem.includes(\"500\") ||\n  mensagem.includes(\"api\") ||\n  mensagem.includes(\"http\")\n) {\n  severidade = \"🟠 Alta\";\n  cor = \"#d83b01\";\n} else if (\n  mensagem.includes(\"javascript\") ||\n  mensagem.includes(\"expression\") ||\n  mensagem.includes(\"syntax\")\n) {\n  severidade = \"🟡 Média\";\n  cor = \"#ffb900\";\n}\n\nconst stackResumo = stack\n  .split(\"\\n\")\n  .slice(0, 10)\n  .join(\"\\n\");\n\nconst html = `\n\n<div style=\"\npadding:24px;\nfont-family:'Segoe UI',Arial,sans-serif;\nfont-size:14px;\nline-height:1.45;\n\">\n\n<table\nwidth=\"100%\"\ncellpadding=\"0\"\ncellspacing=\"0\"\nstyle=\"\nmax-width:860px;\nmargin:auto;\nborder:1px solid #d0d0d0;\n\">\n\n<tr>\n\n<td style=\"\nbackground:#c50f1f;\npadding:26px;\nborder-bottom:1px solid #374151;\n\">\n<div style=\"\nfont-size:13px;\nfont-weight:700;\ncolor:#fecaca;\ntext-transform:uppercase;\nletter-spacing:1px;\n\">\n\nN8N PLATFORM MONITOR\n\n</div>\n\n<div style=\"\nmargin-top:8px;\nfont-size:34px;\nfont-size:20px;\nfont-weight:700;\n\">\n\n🚨 Monitoramento de Automações n8n\n\n</div>\n\n<div style=\"\nmargin-top:8px;\nfont-size:16px;\ncolor:#f3f4f6;\n\">\n\nFoi detectada uma falha durante a execução de uma automação.\n\n</div>\n\n</td>\n\n</tr>\n\n<tr>\n\n<td style=\"padding:26px;\">\n\n<div style=\"\nfont-size:24px;\nfont-weight:700;\nline-height:52px;\nword-break:break-word;\n\">\n\n${error.message ?? \"Erro não informado\"}\n\n</div>\n\n<div style=\"margin-top:20px;\">\n\n<span style=\"\ndisplay:inline-block;\nbackground:${cor};\npadding:7px 16px;\nfont-size:13px;\nfont-weight:700;\n\">\n\n${severidade}\n\n</span>\n\n<span style=\"\nmargin-left:16px;\nfont-size:14px;\ncolor:#d1d5db;\n\">\n\nIncidente:\n<b>\n\n${incidente}\n\n</b>\n\n</span>\n\n</div>\n\n<table\nwidth=\"100%\"\ncellpadding=\"12\"\ncellspacing=\"0\"\nstyle=\"\nmargin-top:30px;\nborder:1px solid #374151;\n\">\n\n<tr>\n\n<td width=\"50%\" style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n⚙ Workflow\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:20px;\nfont-weight:600;\nword-break:break-word;\n\">\n\n${workflow.name ?? \"-\"}\n\n</div>\n\n</td>\n\n<td width=\"50%\" style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n📦 Último Node\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:20px;\nfont-weight:600;\nword-break:break-word;\n\">\n\n${execution.lastNodeExecuted ?? \"-\"}\n\n</div>\n\n</td>\n\n</tr>\n\n<tr>\n\n<td style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n▶ Execução\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:20px;\nfont-weight:700;\n\">\n\n${execution.id ?? \"-\"}\n\n</div>\n\n</td>\n\n<td style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n🌐 Origem\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:20px;\nfont-weight:700;\n\">\n\n${execution.executionContext?.source ?? execution.mode ?? \"-\"}\n\n</div>\n\n</td>\n\n</tr>\n\n<tr>\n\n<td style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n🆔 Workflow ID\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:15px;\nword-break:break-all;\n\">\n\n${workflow.id ?? \"-\"}\n\n</div>\n\n</td>\n\n<td style=\"border:1px solid #374151;\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\n🕒 Data/Hora\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:18px;\nfont-weight:700;\n\">\n\n${data}\n\n</div>\n\n</td>\n\n</tr>\n\n</table>\n<div style=\"\nmargin-top:28px;\ntext-align:center;\n\">\n\n<a\nhref=\"${execution.url ?? \"#\"}\"\nstyle=\"\ndisplay:inline-block;\nbackground:#dc2626;\ntext-decoration:none;\npadding:16px 34px;\nfont-size:16px;\nfont-weight:700;\nborder:1px solid #ef4444;\n\">\n\n🔎 Abrir Execução no n8n\n\n</a>\n\n<div style=\"\nmargin-top:10px;\nfont-size:13px;\ncolor:#9ca3af;\n\">\n\nClique para visualizar todos os detalhes da execução.\n\n</div>\n\n</div>\n\n<table\nwidth=\"100%\"\ncellpadding=\"18\"\ncellspacing=\"0\"\nstyle=\"\nmargin-top:30px;\nborder:1px solid #374151;\n\">\n\n<tr>\n\n<td>\n\n<div style=\"\nfont-size:26px;\nfont-weight:700;\n\">\n\n💻 Diagnóstico Técnico\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:14px;\ncolor:#9ca3af;\n\">\n\nResumo técnico do incidente detectado.\n\n</div>\n\n<hr style=\"\nborder:none;\nborder-top:1px solid #374151;\nmargin:18px 0;\n\">\n\n<div style=\"\nfont-size:12px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\nTipo do Erro\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:20px;\nfont-weight:700;\n\">\n\n${error.name ?? \"Erro não identificado\"}\n\n</div>\n\n<div style=\"\nmargin-top:20px;\nfont-size:12px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\nMensagem\n\n</div>\n\n<div style=\"\nmargin-top:6px;\nfont-size:16px;\nfont-weight:600;\nword-break:break-word;\n\">\n\n${error.message ?? \"-\"}\n\n</div>\n\n<div style=\"\nmargin-top:20px;\nfont-size:12px;\ntext-transform:uppercase;\ncolor:#9ca3af;\n\">\n\nAção Recomendada\n\n</div>\n\n<div style=\"\nmargin-top:8px;\nfont-size:15px;\nline-height:24px;\n\">\n\n${mensagem.includes(\"timeout\")\n? \"Verifique o tempo de resposta do serviço e a disponibilidade da infraestrutura.\"\n: mensagem.includes(\"econnreset\")\n? \"Verifique a conectividade com o banco de dados ou serviço remoto antes de reexecutar o workflow.\"\n: mensagem.includes(\"credential\")\n? \"Valide as credenciais configuradas neste workflow.\"\n: mensagem.includes(\"429\")\n? \"O serviço atingiu o limite de requisições. Aguarde alguns instantes antes de tentar novamente.\"\n: mensagem.includes(\"syntax\") || mensagem.includes(\"javascript\")\n? \"Revise o código ou expressão utilizada no node que gerou a exceção.\"\n: \"Abra a execução para visualizar o stack trace completo e realizar a análise detalhada.\"}\n\n</div>\n\n</td>\n\n</tr>\n\n</table>\n\n<hr style=\"\nborder:none;\nborder-top:1px solid #374151;\nmargin:30px 0;\n\">\n\n<table\nwidth=\"100%\"\ncellpadding=\"0\"\ncellspacing=\"0\">\n\n<tr>\n\n<td>\n\n<div style=\"\nfont-size:20px;\nfont-weight:700;\n\">\n\n🤖 N8N Platform Monitor\n\n</div>\n\n<div style=\"\nmargin-top:8px;\nfont-size:13px;\nline-height:22px;\ncolor:#9ca3af;\n\">\n\nEsta notificação foi gerada automaticamente pelo Monitor de Automações n8n.\n\n</div>\n\n</td>\n\n<td align=\"right\">\n\n<div style=\"\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#6b7280;\n\">\n\nWorkflow\n\n</div>\n\n<div style=\"\nmargin-top:4px;\nfont-size:14px;\nfont-weight:600;\n\">\n\n${workflow.name ?? \"-\"}\n\n</div>\n\n<div style=\"\nmargin-top:12px;\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#6b7280;\n\">\n\nExecução\n\n</div>\n\n<div style=\"\nmargin-top:4px;\nfont-size:14px;\nfont-weight:600;\n\">\n\n${execution.id ?? \"-\"}\n\n</div>\n\n<div style=\"\nmargin-top:12px;\nfont-size:11px;\ntext-transform:uppercase;\ncolor:#6b7280;\n\">\n\nGerado em\n\n</div>\n\n<div style=\"\nmargin-top:4px;\nfont-size:14px;\nfont-weight:600;\n\">\n\n${data}\n\n</div>\n\n</td>\n\n</tr>\n\n</table>\n\n</td>\n\n</tr>\n\n</table>\n\n</div>\n\n`;\n\nreturn [\n  {\n    json: {\n      html,\n      incidente,\n      severidade,\n      workflowName: workflow.name ?? null,\n      workflowId: workflow.id ?? null,\n      executionId: execution.id ?? null,\n      executionUrl: execution.url ?? null,\n      executionMode: execution.mode ?? null,\n      source: execution.executionContext?.source ?? execution.mode ?? null,\n      lastNode: execution.lastNodeExecuted ?? null,\n      errorMessage: error.message ?? null,\n      errorName: error.name ?? null,\n      errorCode: error.code ?? null,\n      stackResumo,\n      stackCompleto: stack,\n      generatedAt: data,\n      raw: $json\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        240
+      ],
+      "id": "55373bbe-a270-4064-9b4e-566ed56270c8",
+      "name": "Normalização1"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalização1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalização1": {
+      "main": [
+        [
+          {
+            "node": "Operações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

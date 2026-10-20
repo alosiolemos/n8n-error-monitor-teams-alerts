@@ -1,0 +1,25 @@
+{
+  "scope": "Validação local sem n8n, APIs, LLM ou envio de mensagens",
+  "tests": [
+    {
+      "name": "erros: inativo e sem dados fixados",
+      "result": "pass"
+    },
+    {
+      "name": "erros: credenciais ausentes e integrações desativadas",
+      "result": "pass"
+    },
+    {
+      "name": "erros: destinos das conexões existem",
+      "result": "pass"
+    },
+    {
+      "name": "erros: JavaScript compila",
+      "result": "pass"
+    },
+    {
+      "name": "Sem padrões de tokens conhecidos",
+      "result": "pass"
+    }
+  ]
+}
